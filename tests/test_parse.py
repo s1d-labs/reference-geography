@@ -1,20 +1,23 @@
-"""Parsing tests on a saved page: fast, no network. Add a saved page for every layout your site has."""
-from pathlib import Path
-
-import crawl
-
-PAGES = Path(__file__).parent / "pages"
+from osm import parse_md5, snapshot
+from family import PROJECTS
 
 
-def test_catalogue_page_gives_twenty_books():
-    rows = crawl.parse((PAGES / "catalogue-page-1.html").read_text(encoding="utf-8"))
-    assert len(rows) == 20
-    rid, book = rows[0]
-    assert rid == "a-light-in-the-attic_1000"                       # the site's own id: stable across runs
-    assert book["title"] == "A Light in the Attic" and book["price"] == "£51.77" and book["availability"] == "In stock"
-    assert book["url"].startswith("https://books.toscrape.com/catalogue/")
-    assert len({r for r, _ in rows}) == 20                          # no duplicate ids on a page
+def test_snapshot_names():
+    assert snapshot("india-261025.osm.pbf") == {"region": "india", "date": "2026-10-25", "format": "osm.pbf"}
+    assert snapshot("north-eastern-zone-261025-free.gpkg.zip") == {"region": "north-eastern-zone", "date": "2026-10-25",
+                                                                   "format": "gpkg.zip"}
+    assert snapshot("india-latest.osm.pbf") is None
+    assert snapshot("india-261025.osm.pbf.md5") is None
 
 
-def test_an_empty_page_gives_nothing():
-    assert crawl.parse("<html><body>No products</body></html>") == []
+def test_md5_file():
+    text = "0987260dd817f9f73a122d1eeadb952c  india-261025.osm.pbf\n"
+    assert parse_md5(text, "india-261025.osm.pbf") == "0987260dd817f9f73a122d1eeadb952c"
+    assert parse_md5(text, "india-261024.osm.pbf") is None
+    assert parse_md5("<html>404</html>", "india-261025.osm.pbf") is None
+
+
+def test_queue():
+    items = PROJECTS[0]["items"]
+    assert len(items) == 13 and len({i["key"] for i in items}) == 13
+    assert all(i["payload"]["url"].startswith("https://download.geofabrik.de/asia/") for i in items)

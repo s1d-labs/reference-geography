@@ -5,9 +5,9 @@
     "pip install -r requirements.txt"
   ],
   "tasks": {
-    "crawl": [
+    "osm": [
       "python",
-      "crawl.py"
+      "osm.py"
     ]
   }
 }

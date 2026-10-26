@@ -2,8 +2,11 @@ name: setup
 
 # Puts this family's projects in the pool and registers its health checks (setup_family.py). Run it by hand after changing
 # family.py. The hub trusts this repo (s1d-labs/<family>) through the GitHub OIDC token; no secrets are needed.
+# It also runs monthly: family.py's queue keys carry the month, so each run seeds a fresh OSM India snapshot.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 6 2 * *"
 
 permissions:
   id-token: write
