@@ -40,6 +40,24 @@ land use 10K), `sisdp`/`sisdpv2` (10K maps), `lulc`, `wasteland`, `disaster`, `p
 - **Only the catalogue.** Bhuvan's WFS is off, and its data policy grants a single-user licence and keeps the vector databases for
   authorised (government) users, so features are not fetched. Cite as "Bhuvan, NRSC/ISRO".
 
+### `reference-geography-datameet`: DataMeet open datasets (github.com/datameet)
+
+Snapshots of 33 of [DataMeet](https://github.com/datameet)'s repositories, about 6.4 GB unpacked: maps (`maps`,
+`indian_village_boundaries`, `India_Official_Boundaries_2019`, `shapefiles`, `taluk_boundaries`, `indian-district-boundaries`,
+`Municipal_Spatial_Data`, `PincodeBoundary`, `kgis`, `landuse_maps`, `pmgsy-geosadak`), pincodes and post offices, the Local
+Government Directory, railways, schools (`udise_schools`), elections, COVID-19 and more (`DATAMEET` in `family.py`).
+
+- **Queue**: one item per repo per commit, key `<repo>@<sha12>`. The monthly **setup** run asks GitHub for each repo's current
+  commit (`git ls-remote`), so a repo is fetched again only when DataMeet changes it.
+- **Task** `datameet` (`datameet.py`): downloads codeload.github.com's tarball of that commit (no history, no rate-limited API),
+  checks the commit id inside the archive, stores it at `<project>/<repo>/<sha>.tar.gz`, and keeps one record per repo
+  (id = repo: `sha`, `commit_time`, `files`, `bytes`, `tar_bytes`, `md5`, `sha256`, `key`, `license_files`, `readme`) and one per
+  file (id = `<repo>/<path>`: `path`, `bytes`, `ext`, `github_url`), so datasets can be found with SQL before unpacking anything.
+- **Left out**: software forks and websites, the mailing-list and chat archives (people's messages), `covid19_stories_archive`
+  (copies of news articles, 3 GB+), `geoBoundaries` (a fork kept in Git LFS; the original is at geoboundaries.org).
+- **Licences differ per repo** (many are ODbL or CC BY; several state none): check `license_files` / the README before
+  publishing anything built on them, and credit DataMeet and the original sources.
+
 ## Working here
 
 ```
@@ -48,6 +66,8 @@ pip install -r requirements.txt pytest "scrape-hub-client @ git+https://github.c
 python -m pytest tests -q
 python osm.py --local [latest-url]     # resolve one file and its checksum, no download
 python bhuvan.py --local [caps-url]    # parse one Bhuvan catalogue, print the first layers
+python datameet.py --local [repo]      # download one DataMeet repo snapshot, print its inventory
 scrape-check --items 2                 # setup + osm task against a local stand-in hub (downloads the two smallest files)
 scrape-check --project reference-geography-bhuvan-vec2 --items 1
+scrape-check --project reference-geography-datameet --items 4
 ```

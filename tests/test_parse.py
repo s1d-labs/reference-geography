@@ -37,4 +37,22 @@ def test_bhuvan_capabilities():
 
 def test_bhuvan_queue():
     names = [p["name"] for p in PROJECTS]
-    assert names == ["reference-geography-osm-india", "reference-geography-bhuvan-vec1", "reference-geography-bhuvan-vec2"]
+    assert names[:3] == ["reference-geography-osm-india", "reference-geography-bhuvan-vec1", "reference-geography-bhuvan-vec2"]
+
+
+def test_datameet_inventory():
+    import tarfile
+    from datameet import inventory, records
+    with tarfile.open(Path(__file__).parent / "pages" / "datameet-Pune_wards-0eb4fc7.tar.gz") as tar:
+        sha, when, files = inventory(tar)
+    assert sha == "0eb4fc7568cd6fd67dc63ca7da3426fe86af6b0a" and when.startswith("2015-08-25")
+    assert ("GeoData/pune-admin-wards.geojson", 297307) in files and len(files) == 6
+    rows = records("Pune_wards", sha, when, files)
+    assert rows[0][0] == "Pune_wards" and rows[0][1]["files"] == 6 and rows[0][1]["readme"] == "Readme.md"
+    assert dict(rows)["Pune_wards/CSVs/pune-wards-info.csv"]["ext"] == "csv"
+    assert len({rid for rid, _ in rows}) == len(rows)
+
+
+def test_datameet_project():
+    p = next(p for p in PROJECTS if p["name"] == "reference-geography-datameet")
+    assert callable(p["items"]) and p["target"] == "codeload.github.com"

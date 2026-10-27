@@ -1,10 +1,12 @@
 """Helpers the family's tasks share: polite GETs that report the counters the hub's speed control runs on, and a stand-in hub
 for `--local` runs."""
+import hashlib
 import time
 
 import requests
 
 UA = "s1d-labs scraper (https://github.com/s1d-labs)"
+CHUNK = 8 << 20
 
 
 class LocalHub:
@@ -43,3 +45,16 @@ def request(hub, session, url, stream=False, timeout=(30, 120)):
         r.close()
         return None
     return r
+
+
+def download(hub, r, out):
+    """Stream the response into file `out`; (bytes, md5) of what arrived."""
+    h, n, t = hashlib.md5(), 0, time.time()
+    with r:
+        for chunk in r.iter_content(CHUNK):
+            out.write(chunk)
+            h.update(chunk)
+            n += len(chunk)
+    hub.metric("download_s", time.time() - t)
+    hub.metric("downloaded_bytes", n)
+    return n, h.hexdigest()

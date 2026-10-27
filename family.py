@@ -65,6 +65,48 @@ PROJECTS += [
     for s, n in BHUVAN.items()
 ]
 
+# DataMeet (github.com/datameet): the community's open India datasets, one snapshot per repo per commit. The monthly setup run
+# asks GitHub for each repo's current commit (git ls-remote, not the rate-limited API), so a repo is fetched again only when it
+# changes. Left out: their software forks and websites, the mailing-list and chat archives (people's messages),
+# covid19_stories_archive (copies of news articles, over 3 GB in 32,000+ files) and geoBoundaries (a fork kept in Git LFS).
+DATAMEET = {                 # repo -> files in it (Oct 2026; for progress on the dashboard); smallest repos first
+    "pune": 1, "catalog": 1, "garbage-go": 3, "pincode": 17, "openpostboxindia": 123, "Pune_wards": 6, "cricket": 21,
+    "docs": 2, "openpostbox": 88, "indian-district-boundaries": 40, "Pune_Municpal_Data": 155, "PincodeBoundary": 7,
+    "landuse_maps": 4, "daksh": 3, "pincodes": 5, "taluk_boundaries": 7, "covid-vaccination-centers": 4, "pmjdy": 320,
+    "Bihar-AC-Election-Report-Cards": 1366, "INDIA_PINCODES": 12, "Municipal_Spatial_Data": 264, "railways": 4,
+    "india-local-government-directory": 3, "kgis": 35, "covid-19-indian-state-reports": 442, "india-election-data": 464,
+    "India_Official_Boundaries_2019": 630, "shapefiles": 480, "maps": 725, "indian_village_boundaries": 172,
+    "covid19": 4192, "udise_schools": 1844, "pmgsy-geosadak": 150,
+}
+
+
+def datameet_items():
+    """The queue: one item per repo at its current commit. Asks GitHub, so setup_family calls it, not imports."""
+    import subprocess
+    items = []
+    for repo, files in DATAMEET.items():
+        out = subprocess.run(["git", "ls-remote", f"https://github.com/datameet/{repo}", "HEAD"],
+                             capture_output=True, text=True, timeout=60, check=True).stdout
+        sha = out.split()[0]
+        items.append({"key": f"{repo}@{sha[:12]}", "payload": {
+            "repo": repo, "sha": sha, "url": f"https://codeload.github.com/datameet/{repo}/tar.gz/{sha}", "expected": files + 1}})
+    return items
+
+
+PROJECTS.append({
+    "name": f"{FAMILY}-datameet",
+    "title": "DataMeet open datasets (github.com/datameet)",
+    "task": "datameet",
+    "target": "codeload.github.com",
+    "env": {},
+    "probe": f"{FAMILY}:github.com",
+    "max_workers": 2,
+    "unit_label": "repo", "record_label": "file",
+    "items": datameet_items,                 # a function: see setup_family.py
+})
+
 # health checks the hub runs every minute; work for a project holds while its probe fails
 PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}] + [
-    {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN]
+    {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN] + [
+    {"name": f"{FAMILY}:github.com", "url": "https://raw.githubusercontent.com/datameet/catalog/master/README.md",
+     "expect": "datameet google group"}]

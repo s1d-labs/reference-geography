@@ -12,6 +12,10 @@
     "bhuvan": [
       "python",
       "bhuvan.py"
+    ],
+    "datameet": [
+      "python",
+      "datameet.py"
     ]
   }
 }

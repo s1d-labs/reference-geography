@@ -6,7 +6,6 @@ Each queue item is one Geofabrik `*-latest*` URL. Geofabrik answers it with a re
 Geofabrik's .md5 (published for .osm.pbf, not for .gpkg.zip) and its Content-Length, store it at
 <project>/<YYYY-MM-DD>/<dated name> through the hub's signed upload link, and keep one record per file, id = the dated name.
 """
-import hashlib
 import json
 import os
 import re
@@ -16,13 +15,12 @@ import time
 
 import requests
 
-from common import LocalHub, request
+from common import LocalHub, download, request
 
 PROJECT = os.environ.get("SCRAPE_POOL_PROJECT", "")
 BUDGET_S = float(os.environ.get("SCRAPE_MAX_HOURS", "1")) * 3600
 DEADLINE = time.time() + BUDGET_S - 120
 NEEDS_S = min(15 * 60, BUDGET_S / 4)    # don't start a file with less time left: the biggest takes minutes to fetch and to store
-CHUNK = 8 << 20
 DATED = re.compile(r"^(?P<region>[a-z-]+?)-(?P<yymmdd>\d{6})(?P<free>-free)?\.(?P<format>osm\.pbf|gpkg\.zip|shp\.zip)$")
 CONTENT_TYPES = {"osm.pbf": "application/octet-stream", "gpkg.zip": "application/zip", "shp.zip": "application/zip"}
 
@@ -62,19 +60,6 @@ def resolve(hub, session, url):
             r.close()
             return f"no checksum for {name}"
     return r, name, info, md5
-
-
-def download(hub, r, out):
-    """Stream the response into file `out`; (bytes, md5) of what arrived."""
-    h, n, t = hashlib.md5(), 0, time.time()
-    with r:
-        for chunk in r.iter_content(CHUNK):
-            out.write(chunk)
-            h.update(chunk)
-            n += len(chunk)
-    hub.metric("download_s", time.time() - t)
-    hub.metric("downloaded_bytes", n)
-    return n, h.hexdigest()
 
 
 def fetch_file(hub, session, url):
