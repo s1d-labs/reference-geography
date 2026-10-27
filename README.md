@@ -25,6 +25,21 @@ Monthly snapshots of the [Geofabrik India extract](https://download.geofabrik.de
 
 Data © OpenStreetMap contributors, available under the [ODbL](https://opendatacommons.org/licenses/odbl/); extracts by Geofabrik GmbH.
 
+### `reference-geography-bhuvan-vec1`, `-vec2`: Bhuvan WMS layer catalogue (ISRO / NRSC)
+
+The list of map layers [Bhuvan](https://bhuvan.nrsc.gov.in) publishes on its two vector GeoServers, `bhuvan-vec1.nrsc.gov.in`
+(about 6,700 layers) and `bhuvan-vec2.nrsc.gov.in` (about 3,800); 9,700 distinct, 775 on both. Workspaces include `nuis` (urban
+land use 10K), `sisdp`/`sisdpv2` (10K maps), `lulc`, `wasteland`, `disaster`, `pmgsy`, `vill-census`, `admin`, `postal`.
+
+- **Queue**: one item per server per month, key `YYYY-MM/capabilities`, seeded by the same monthly **setup** run.
+- **Task** `bhuvan` (`bhuvan.py`): fetches the server's full WMS 1.3.0 GetCapabilities (vec2 can take two minutes to answer), stores
+  it gzipped at `<project>/<YYYY-MM-DD>/wms-capabilities.xml.gz`, and keeps one record per layer, id = layer name (`nuis:AP_TP_UL10K`):
+  `workspace`, `title`, `abstract`, `keywords`, `crs`, `bbox` [w, s, e, n] (null when the server doesn't know it), `queryable`,
+  `min_scale`, `max_scale`, `styles` (with legend URLs), `server`, `wms_url`, `seen` (the day of the last catalogue that listed it).
+- **Health check**: a 1 KB legend image (`moef:biosphere`) per server; the capabilities are 220 KB even for an empty workspace.
+- **Only the catalogue.** Bhuvan's WFS is off, and its data policy grants a single-user licence and keeps the vector databases for
+  authorised (government) users, so features are not fetched. Cite as "Bhuvan, NRSC/ISRO".
+
 ## Working here
 
 ```
@@ -32,5 +47,7 @@ python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt pytest "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
 python -m pytest tests -q
 python osm.py --local [latest-url]     # resolve one file and its checksum, no download
-scrape-check --items 2                 # setup + task against a local stand-in hub (downloads the two smallest files)
+python bhuvan.py --local [caps-url]    # parse one Bhuvan catalogue, print the first layers
+scrape-check --items 2                 # setup + osm task against a local stand-in hub (downloads the two smallest files)
+scrape-check --project reference-geography-bhuvan-vec2 --items 1
 ```

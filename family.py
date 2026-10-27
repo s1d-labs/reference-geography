@@ -43,5 +43,28 @@ PROJECTS = [
     },
 ]
 
+# Bhuvan (ISRO's geoportal): the catalogue of layers its two vector GeoServers publish over WMS, one project per server so the
+# hub's per-host limits and health checks match. Monthly, like OSM India: a refresh that just updates each layer's record.
+BHUVAN = {"vec1": 6700, "vec2": 3800}       # server -> layers it lists (about; for progress on the dashboard)
+# health check: a 1 KB legend image of a layer both servers publish (their capabilities are 220 KB even when empty)
+BHUVAN_PROBE = "https://bhuvan-{s}.nrsc.gov.in/bhuvan/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=moef%3Abiosphere"
+
+PROJECTS += [
+    {
+        "name": f"{FAMILY}-bhuvan-{s}",
+        "title": f"Bhuvan WMS layer catalogue (bhuvan-{s})",
+        "task": "bhuvan",
+        "target": f"bhuvan-{s}.nrsc.gov.in",
+        "env": {},
+        "probe": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in",
+        "max_workers": 1,
+        "unit_label": "catalogue", "record_label": "layer",
+        "items": [{"key": f"{MONTH}/capabilities", "payload": {
+            "url": f"https://bhuvan-{s}.nrsc.gov.in/bhuvan/wms?service=WMS&version=1.3.0&request=GetCapabilities", "expected": n}}],
+    }
+    for s, n in BHUVAN.items()
+]
+
 # health checks the hub runs every minute; work for a project holds while its probe fails
-PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}]
+PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}] + [
+    {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN]

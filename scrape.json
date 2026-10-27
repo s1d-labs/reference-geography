@@ -8,6 +8,10 @@
     "osm": [
       "python",
       "osm.py"
+    ],
+    "bhuvan": [
+      "python",
+      "bhuvan.py"
     ]
   }
 }

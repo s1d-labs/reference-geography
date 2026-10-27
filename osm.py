@@ -13,15 +13,15 @@ import re
 import sys
 import tempfile
 import time
-from pathlib import Path
 
 import requests
+
+from common import LocalHub, request
 
 PROJECT = os.environ.get("SCRAPE_POOL_PROJECT", "")
 BUDGET_S = float(os.environ.get("SCRAPE_MAX_HOURS", "1")) * 3600
 DEADLINE = time.time() + BUDGET_S - 120
 NEEDS_S = min(15 * 60, BUDGET_S / 4)    # don't start a file with less time left: the biggest takes minutes to fetch and to store
-UA = "s1d-labs scraper (https://github.com/s1d-labs)"
 CHUNK = 8 << 20
 DATED = re.compile(r"^(?P<region>[a-z-]+?)-(?P<yymmdd>\d{6})(?P<free>-free)?\.(?P<format>osm\.pbf|gpkg\.zip|shp\.zip)$")
 CONTENT_TYPES = {"osm.pbf": "application/octet-stream", "gpkg.zip": "application/zip", "shp.zip": "application/zip"}
@@ -42,44 +42,6 @@ def parse_md5(text, name):
     if len(parts) == 2 and re.fullmatch(r"[0-9a-f]{32}", parts[0]) and parts[1] == name:
         return parts[0]
     return None
-
-
-class LocalHub:
-    """Stand-in for HubClient so `--local` runs without the hub: counters go to stderr."""
-    settings = {"threads": 1, "delay_ms": 0, "paused": False}
-
-    def __init__(self):
-        self.counts = {}
-
-    def metric(self, name, value=1):
-        self.counts[name] = self.counts.get(name, 0) + value
-
-    def error(self, n=1):
-        self.metric("errors", n)
-
-    def block(self, n=1):
-        self.metric("blocked", n)
-
-
-def request(hub, session, url, stream=False):
-    """GET with the standard counters; the response if 200, else None. For a stream, t_http_s is the time to the answer's
-    headers (what tells a busy server from a calm one); the transfer itself is counted as download_s."""
-    t = time.time()
-    try:
-        r = session.get(url, timeout=(30, 120), stream=stream, headers={"User-Agent": UA})
-    except requests.RequestException:
-        hub.metric("http_error")
-        hub.error()
-        return None
-    hub.metric("n_http")
-    hub.metric("t_http_s", time.time() - t)
-    if r.status_code != 200:
-        hub.metric(f"http_{r.status_code}")
-        if r.status_code in (403, 429, 503):
-            hub.block()
-        r.close()
-        return None
-    return r
 
 
 def resolve(hub, session, url):

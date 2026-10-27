@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?><WMS_Capabilities version="1.3.0" updateSequence="4168" xmlns="http://www.opengis.net/wms" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms https://bhuvan-vec1.nrsc.gov.in/bhuvan/schemas/wms/1.3.0/capabilities_1_3_0.xsd">
+  <Service>
+    <Name>WMS</Name>
+    <Title>GeoServer Web Map Service</Title>
+    <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+    <KeywordList>
+      <Keyword>WMS</Keyword>
+      <Keyword>GEOSERVER</Keyword>
+    </KeywordList>
+    <OnlineResource xlink:type="simple" xlink:href="http://geoserver.org"/>
+    <ContactInformation>
+      <ContactPersonPrimary>
+        <ContactPerson>Bhuvan</ContactPerson>
+        <ContactOrganization>NRSC</ContactOrganization>
+      </ContactPersonPrimary>
+      <ContactPosition>Bhuvan</ContactPosition>
+      <ContactAddress>
+        <AddressType>Work</AddressType>
+        <Address/>
+        <City>Hyderabad</City>
+        <StateOrProvince>Telangana</StateOrProvince>
+        <PostCode/>
+        <Country>India</Country>
+      </ContactAddress>
+      <ContactVoiceTelephone/>
+      <ContactFacsimileTelephone/>
+      <ContactElectronicMailAddress>bhuvan@nrsc.gov.in</ContactElectronicMailAddress>
+    </ContactInformation>
+    <Fees>NONE</Fees>
+    <AccessConstraints>NONE</AccessConstraints>
+  </Service>
+  <Capability>
+    <Request>
+      <GetCapabilities>
+        <Format>text/xml</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?SERVICE=WMS&amp;"/>
+            </Get>
+            <Post>
+              <OnlineResource xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?SERVICE=WMS&amp;"/>
+            </Post>
+          </HTTP>
+        </DCPType>
+      </GetCapabilities>
+      <GetMap>
+        <Format>image/png</Format>
+        <Format>image/gif</Format>
+        <Format>image/jpeg</Format>
+        <Format>image/png; mode=8bit</Format>
+        <Format>image/vnd.jpeg-png</Format>
+        <Format>image/vnd.jpeg-png8</Format>
+        <Format>text/html; subtype=openlayers</Format>
+        <Format>text/html; subtype=openlayers2</Format>
+        <Format>text/html; subtype=openlayers3</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetMap>
+      <GetFeatureInfo>
+        <Format>text/plain</Format>
+        <Format>application/vnd.ogc.gml</Format>
+        <Format>text/xml</Format>
+        <Format>application/vnd.ogc.gml/3.1.1</Format>
+        <Format>text/xml; subtype=gml/3.1.1</Format>
+        <Format>text/html</Format>
+        <Format>application/json</Format>
+        <DCPType>
+          <HTTP>
+            <Get>
+              <OnlineResource xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?SERVICE=WMS&amp;"/>
+            </Get>
+          </HTTP>
+        </DCPType>
+      </GetFeatureInfo>
+    </Request>
+    <Exception>
+      <Format>XML</Format>
+      <Format>INIMAGE</Format>
+      <Format>BLANK</Format>
+      <Format>JSON</Format>
+    </Exception>
+    <Layer>
+      <Title>GeoServer Web Map Service</Title>
+      <Abstract>A compliant implementation of WMS plus most of the SLD extension (dynamic styling). Can also generate PDF, SVG, KML, GeoRSS</Abstract>
+      <!--All supported Coordinate Reference Systems:-->
+      <CRS>CRS:84</CRS>
+      <CRS>EPSG:4326</CRS>
+      <EX_GeographicBoundingBox>
+        <westBoundLongitude>-179.99999999999997</westBoundLongitude>
+        <eastBoundLongitude>180.0000000220001</eastBoundLongitude>
+        <southBoundLatitude>-90.0</southBoundLatitude>
+        <northBoundLatitude>90.00000000000006</northBoundLatitude>
+      </EX_GeographicBoundingBox>
+      <BoundingBox CRS="CRS:84" minx="-179.99999999999997" miny="-90.0" maxx="180.0000000220001" maxy="90.00000000000006"/>
+      <Layer queryable="1">
+        <Name>world:world_base</Name>
+        <Title>world:world_base</Title>
+        <Abstract/>
+        <KeywordList/>
+        <CRS>EPSG:4326</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999999999997</westBoundLongitude>
+          <eastBoundLongitude>180.0000000220001</eastBoundLongitude>
+          <southBoundLatitude>-89.99999999999994</southBoundLatitude>
+          <northBoundLatitude>90.00000000000006</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999999999997" miny="-89.99999999999994" maxx="180.0000000220001" maxy="90.00000000000006"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99999999999994" miny="-179.99999999999997" maxx="90.00000000000006" maxy="180.0000000220001"/>
+        <Style>
+          <Name>default-style-world:world_base</Name>
+          <Title>world:world_base style</Title>
+          <Abstract>Default style for world:world_base layer</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_base"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1">
+        <Name>world:world_dis</Name>
+        <Title>world:world_dis</Title>
+        <Abstract/>
+        <KeywordList/>
+        <CRS>EPSG:4326</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999999999997</westBoundLongitude>
+          <eastBoundLongitude>180.000000022</eastBoundLongitude>
+          <southBoundLatitude>-90.0</southBoundLatitude>
+          <northBoundLatitude>89.99999999999994</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999999999997" miny="-90.0" maxx="180.000000022" maxy="89.99999999999994"/>
+        <BoundingBox CRS="EPSG:4326" minx="-90.0" miny="-179.99999999999997" maxx="89.99999999999994" maxy="180.000000022"/>
+        <Style>
+          <Name>default-style-world:world_dis</Name>
+          <Title>world:world_dis style</Title>
+          <Abstract>Default style for world:world_dis layer</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_dis"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1">
+        <Name>world:world_labels</Name>
+        <Title>world:world_labels</Title>
+        <Abstract/>
+        <KeywordList/>
+        <CRS>EPSG:4326</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-178.116684</westBoundLongitude>
+          <eastBoundLongitude>179.215217</eastBoundLongitude>
+          <southBoundLatitude>-76.602642</southBoundLatitude>
+          <northBoundLatitude>78.314568</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-178.116684" miny="-76.602642" maxx="179.215217" maxy="78.314568"/>
+        <BoundingBox CRS="EPSG:4326" minx="-76.602642" miny="-178.116684" maxx="78.314568" maxy="179.215217"/>
+        <Style>
+          <Name>default-style-world:world_labels</Name>
+          <Title>world:world_labels style</Title>
+          <Abstract>Default style for world:world_labels layer</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_labels"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1">
+        <Name>world:world_oscat</Name>
+        <Title>world:world_oscat</Title>
+        <Abstract/>
+        <KeywordList/>
+        <CRS>EPSG:4326</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999997799992</westBoundLongitude>
+          <eastBoundLongitude>180.000000022</eastBoundLongitude>
+          <southBoundLatitude>-89.99993549399994</southBoundLatitude>
+          <northBoundLatitude>83.62366450600007</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999997799992" miny="-89.99993549399994" maxx="180.000000022" maxy="83.62366450600007"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99993549399994" miny="-179.99999997799992" maxx="83.62366450600007" maxy="180.000000022"/>
+        <Style>
+          <Name>default-style-world:world_oscat</Name>
+          <Title>world:world_oscat style</Title>
+          <Abstract>Default style for world:world_oscat layer</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_oscat"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:gulfs</Name>
+        <Title>gulfs</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>gulfs</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>69.04182277700005</westBoundLongitude>
+          <eastBoundLongitude>72.92273708600004</eastBoundLongitude>
+          <southBoundLatitude>22.126229842000043</southBoundLatitude>
+          <northBoundLatitude>23.22191278400004</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="69.04182277700005" miny="22.126229842000043" maxx="72.92273708600004" maxy="23.22191278400004"/>
+        <BoundingBox CRS="EPSG:4326" minx="22.126229842000043" miny="69.04182277700005" maxx="23.22191278400004" maxy="72.92273708600004"/>
+        <Style>
+          <Name>gulf_poly</Name>
+          <Title>gulf_poly</Title>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Agulfs"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_cities1</Name>
+        <Title>world_cities1</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>world_cities1</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>39.6163171</westBoundLongitude>
+          <eastBoundLongitude>121.4888922</eastBoundLongitude>
+          <southBoundLatitude>6.0338199</southBoundLatitude>
+          <northBoundLatitude>39.9059093</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="39.6163171" miny="6.0338199" maxx="121.4888922" maxy="39.9059093"/>
+        <BoundingBox CRS="EPSG:4326" minx="6.0338199" miny="39.6163171" maxx="39.9059093" maxy="121.4888922"/>
+        <Style>
+          <Name>world_city</Name>
+          <Title>Default Point</Title>
+          <Abstract>A sample style that draws a point</Abstract>
+          <LegendURL width="98" height="40">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_cities1"/>
+          </LegendURL>
+        </Style>
+        <MinScaleDenominator>20000.0</MinScaleDenominator>
+        <MaxScaleDenominator>1.5E7</MaxScaleDenominator>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_fill</Name>
+        <Title>world_fill</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>world_fill</Keyword>
+          <Keyword>features</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999999999997</westBoundLongitude>
+          <eastBoundLongitude>180.0000000220001</eastBoundLongitude>
+          <southBoundLatitude>-89.99999999999994</southBoundLatitude>
+          <northBoundLatitude>90.00000000000006</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999999999997" miny="-89.99999999999994" maxx="180.0000000220001" maxy="90.00000000000006"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99999999999994" miny="-179.99999999999997" maxx="90.00000000000006" maxy="180.0000000220001"/>
+        <Style>
+          <Name>world_fill1</Name>
+          <Title>world_fill1</Title>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_fill"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_final</Name>
+        <Title>world_final</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>world_final</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999997799992</westBoundLongitude>
+          <eastBoundLongitude>180.000000022</eastBoundLongitude>
+          <southBoundLatitude>-89.99993549399994</southBoundLatitude>
+          <northBoundLatitude>83.62366450600007</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999997799992" miny="-89.99993549399994" maxx="180.000000022" maxy="83.62366450600007"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99993549399994" miny="-179.99999997799992" maxx="83.62366450600007" maxy="180.000000022"/>
+        <Style>
+          <Name>world_line</Name>
+          <Title>Default Line</Title>
+          <Abstract>A sample style that draws a line</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_final"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_finalbase</Name>
+        <Title>world_final</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>world_final</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999997799992</westBoundLongitude>
+          <eastBoundLongitude>180.000000022</eastBoundLongitude>
+          <southBoundLatitude>-89.99993549399994</southBoundLatitude>
+          <northBoundLatitude>83.62366450600007</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999997799992" miny="-89.99993549399994" maxx="180.000000022" maxy="83.62366450600007"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99993549399994" miny="-179.99999997799992" maxx="83.62366450600007" maxy="180.000000022"/>
+        <Style>
+          <Name>world_boundary98</Name>
+          <Title>Default Polygon</Title>
+          <Abstract>A sample style that draws a polygon</Abstract>
+          <LegendURL width="228" height="40">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_finalbase"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_finalfill</Name>
+        <Title>world_final</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>world_final</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-179.99999997799992</westBoundLongitude>
+          <eastBoundLongitude>180.000000022</eastBoundLongitude>
+          <southBoundLatitude>-89.99993549399994</southBoundLatitude>
+          <northBoundLatitude>83.62366450600007</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-179.99999997799992" miny="-89.99993549399994" maxx="180.000000022" maxy="83.62366450600007"/>
+        <BoundingBox CRS="EPSG:4326" minx="-89.99993549399994" miny="-179.99999997799992" maxx="83.62366450600007" maxy="180.000000022"/>
+        <Style>
+          <Name>world_boundary</Name>
+          <Title>Default Polygon</Title>
+          <Abstract>A sample style that draws a polygon</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_finalfill"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_label</Name>
+        <Title>world_label</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>world_label</Keyword>
+          <Keyword>features</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-178.116684</westBoundLongitude>
+          <eastBoundLongitude>179.215217</eastBoundLongitude>
+          <southBoundLatitude>-76.602642</southBoundLatitude>
+          <northBoundLatitude>78.314568</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-178.116684" miny="-76.602642" maxx="179.215217" maxy="78.314568"/>
+        <BoundingBox CRS="EPSG:4326" minx="-76.602642" miny="-178.116684" maxx="78.314568" maxy="179.215217"/>
+        <Style>
+          <Name>world_label</Name>
+          <Title>Capital cities1</Title>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_label"/>
+          </LegendURL>
+        </Style>
+        <MaxScaleDenominator>2.768399E7</MaxScaleDenominator>
+      </Layer>
+      <Layer queryable="1" opaque="0">
+        <Name>world:world_label_woindia</Name>
+        <Title>world_label_woindia</Title>
+        <Abstract/>
+        <KeywordList>
+          <Keyword>features</Keyword>
+          <Keyword>world_label_woindia</Keyword>
+        </KeywordList>
+        <CRS>EPSG:4326</CRS>
+        <CRS>CRS:84</CRS>
+        <EX_GeographicBoundingBox>
+          <westBoundLongitude>-178.116684</westBoundLongitude>
+          <eastBoundLongitude>179.215217</eastBoundLongitude>
+          <southBoundLatitude>-76.602642</southBoundLatitude>
+          <northBoundLatitude>78.314568</northBoundLatitude>
+        </EX_GeographicBoundingBox>
+        <BoundingBox CRS="CRS:84" minx="-178.116684" miny="-76.602642" maxx="179.215217" maxy="78.314568"/>
+        <BoundingBox CRS="EPSG:4326" minx="-76.602642" miny="-178.116684" maxx="78.314568" maxy="179.215217"/>
+        <Style>
+          <Name>world_countrywoinida</Name>
+          <Title>Default Point</Title>
+          <Abstract>A sample style that draws a point</Abstract>
+          <LegendURL width="20" height="20">
+            <Format>image/png</Format>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="https://bhuvan-vec1.nrsc.gov.in/bhuvan/ows?service=WMS&amp;version=1.3.0&amp;request=GetLegendGraphic&amp;format=image%2Fpng&amp;width=20&amp;height=20&amp;layer=world%3Aworld_label_woindia"/>
+          </LegendURL>
+        </Style>
+      </Layer>
+    </Layer>
+  </Capability>
+</WMS_Capabilities>
