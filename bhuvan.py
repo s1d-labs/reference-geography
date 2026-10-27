@@ -2,7 +2,7 @@
 Try it without the hub: python bhuvan.py --local [capabilities-url]   (prints the first records and the layer count)
 
 Each queue item is one Bhuvan GeoServer's full WMS GetCapabilities (bhuvan-vec1 about 6,700 layers and 10 MB, bhuvan-vec2 about
-3,800). We keep the raw document, gzipped, at <project>/<YYYY-MM-DD>/wms-capabilities.xml.gz and one record per layer,
+4,600). We keep the raw document, gzipped, at <project>/<YYYY-MM-DD>/wms-capabilities.xml.gz and one record per layer,
 id = the layer name (e.g. "nuis:AP_TP_UL10K"). Only the catalogue: Bhuvan's WFS is off and its data policy keeps the vector
 databases for authorised (government) users, so the layers' features are not fetched.
 """

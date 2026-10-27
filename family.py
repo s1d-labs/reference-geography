@@ -45,7 +45,7 @@ PROJECTS = [
 
 # Bhuvan (ISRO's geoportal): the catalogue of layers its two vector GeoServers publish over WMS, one project per server so the
 # hub's per-host limits and health checks match. Monthly, like OSM India: a refresh that just updates each layer's record.
-BHUVAN = {"vec1": 6700, "vec2": 3800}       # server -> layers it lists (about; for progress on the dashboard)
+BHUVAN = {"vec1": 6700, "vec2": 4600}       # server -> layers it lists (about; for progress on the dashboard)
 # health check: a 1 KB legend image of a layer both servers publish (their capabilities are 220 KB even when empty)
 BHUVAN_PROBE = "https://bhuvan-{s}.nrsc.gov.in/bhuvan/ows?service=WMS&version=1.3.0&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=moef%3Abiosphere"
 

@@ -28,7 +28,7 @@ Data © OpenStreetMap contributors, available under the [ODbL](https://opendatac
 ### `reference-geography-bhuvan-vec1`, `-vec2`: Bhuvan WMS layer catalogue (ISRO / NRSC)
 
 The list of map layers [Bhuvan](https://bhuvan.nrsc.gov.in) publishes on its two vector GeoServers, `bhuvan-vec1.nrsc.gov.in`
-(about 6,700 layers) and `bhuvan-vec2.nrsc.gov.in` (about 3,800); 9,700 distinct, 775 on both. Workspaces include `nuis` (urban
+(about 6,700 layers) and `bhuvan-vec2.nrsc.gov.in` (about 4,600; Oct 2026). Workspaces include `nuis` (urban
 land use 10K), `sisdp`/`sisdpv2` (10K maps), `lulc`, `wasteland`, `disaster`, `pmgsy`, `vill-census`, `admin`, `postal`.
 
 - **Queue**: one item per server per month, key `YYYY-MM/capabilities`, seeded by the same monthly **setup** run.
