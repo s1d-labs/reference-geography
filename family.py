@@ -190,7 +190,7 @@ PROJECTS.append({
     "target": "censusindia.gov.in",
     "env": {},
     "probe": f"{FAMILY}:censusindia.gov.in",
-    "max_workers": 12,                       # TEMPORARY until ~22:00 UTC 2026-10-28: 6 real + 6 stale slots of cancelled runs; back to 6
+    "max_workers": 6,                        # behind a firewall that rejects what it doesn't like: 3 at first, 6 for the backfill
     "unit_label": "table or entry", "record_label": "file",
     "items": census_items,                   # a function: see setup_family.py
 })
