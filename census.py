@@ -222,7 +222,7 @@ def main():
                 break                                   # nothing left for this project: exit, the worker asks the hub for more
             item = items[0]
             n, why = run(hub, session, item)
-            hub.complete([item["key"]], "failed" if why else "done", error=(why or "")[:200] or None, fetched=n)
+            hub.complete([item["key"]], "failed" if why else "done", error=(why or "")[:200], fetched=n)   # error: a string
         hub.close()
     except BaseException as e:
         hub.close("failed", f"{type(e).__name__}: {e}"[:200])
