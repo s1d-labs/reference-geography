@@ -132,7 +132,7 @@ PROJECTS.append({
     "target": "catalogue.dataspace.copernicus.eu",
     "env": {},
     "probe": f"{FAMILY}:catalogue.dataspace.copernicus.eu",
-    "max_workers": 2,
+    "max_workers": 6,                        # 2 at first; 6 for the backfill, watching for 429s (the hub backs off on them)
     "unit_label": "month", "record_label": "product",
     # oldest months first: they are the smallest, which keeps scrape-check's few items quick
     "items": [{"key": f"{c}/{m}", "payload": {"collection": c, "month": m, "expected": n}}
