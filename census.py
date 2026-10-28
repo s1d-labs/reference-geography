@@ -36,13 +36,25 @@ REJECTED = "Request Rejected"
 GIVE_UP = 5                 # tries of an item before files that still fail (not firewall refusals) are kept as unavailable
 
 
+def _get_json(s, url, params=None, timeout=120, tries=4):
+    """GET JSON from the catalogue, trying again when the site drops the connection (it does under load)."""
+    for i in range(tries):
+        try:
+            r = s.get(url, params=params, timeout=timeout, headers={"User-Agent": UA})
+            r.raise_for_status()
+            return r.json()
+        except (requests.RequestException, ValueError):
+            if i == tries - 1:
+                raise
+            time.sleep(10 * (i + 1))
+
+
 def list_tables(session=None):
     """Every census table with its files: [{"table_id", "title", "census_year", "series", "files": [...]}]."""
     s = session or requests.Session()
     out, offset = [], 0
     while True:
-        d = s.get(f"{NADA}/api/tables/data/global/census_tables/300/{offset}/?ft_query=", timeout=300,
-                  headers={"User-Agent": UA}).json()
+        d = _get_json(s, f"{NADA}/api/tables/data/global/census_tables/300/{offset}/?ft_query=", timeout=300)
         for t in d["data"]:
             files = [{"url": l["link"], "format": l["format"].lower(), "area": "", "state": "", "district": ""} for l in t.get("links") or []]
             for it in t.get("items") or []:
@@ -63,8 +75,7 @@ def list_library(session=None):
     for kind in LIBRARY_TYPES:
         page = 1                                    # the search pages by `page`; it ignores `offset`
         while True:
-            r = s.get(f"{NADA}/api/catalog/search", params={"ps": 100, "type": kind, "page": page}, timeout=120,
-                      headers={"User-Agent": UA}).json()["result"]
+            r = _get_json(s, f"{NADA}/api/catalog/search", params={"ps": 100, "type": kind, "page": page})["result"]
             for x in r["rows"]:
                 if int(x["id"]) not in seen:
                     seen.add(int(x["id"]))
