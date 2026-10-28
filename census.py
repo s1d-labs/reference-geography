@@ -33,6 +33,7 @@ UA = "s1d-labs scraper (https://github.com/s1d-labs)"
 LIBRARY_TYPES = ("document", "image", "video", "timeseries")
 DOWNLOAD = re.compile(r"https://censusindia\.gov\.in/nada/index\.php/catalog/(\d+)/download/(\d+)/([^\"'<>\s]+)")
 REJECTED = "Request Rejected"
+GIVE_UP = 5                 # tries of an item before files that still fail (not firewall refusals) are kept as unavailable
 
 
 def list_tables(session=None):
@@ -114,6 +115,18 @@ def store(hub, session, url, path, rid, meta):
     return {**meta, "url": url, "bytes": n, "md5": md5, "sha256": stored["sha256"], "key": stored["key"]}
 
 
+def settle(hub, p, failed, summary):
+    """None when the item is done; else why it failed. Files that keep failing (not firewall refusals) are recorded as
+    unavailable once the item has had GIVE_UP tries, so one broken link doesn't keep the rest downloading again."""
+    if not failed:
+        return None
+    if p.get("_attempts", 1) >= GIVE_UP and not any("firewall" in f for f, _ in failed):
+        for why, rid in failed:
+            hub.record(rid, {"kind": "unavailable", "reason": why, "tries": p.get("_attempts")})
+        return None
+    return f"{summary}: {failed[0][0]}"
+
+
 def run_table(hub, session, p):
     n, failed = 0, []
     for f in p["files"]:
@@ -125,7 +138,7 @@ def run_table(hub, session, p):
                     {"kind": "table_file", "table_id": p["table_id"], "census_year": p["census_year"], "file": name,
                      "format": f["format"], "area_id": f["area"], "state": f["state"], "district": f["district"]})
         if isinstance(got, str):
-            failed.append(f"{name}: {got}")
+            failed.append((f"{name}: {got}", f"file/{cid}/{rid}"))
             hub.failure("file", f"file/{cid}/{rid}", got, url=f["url"])
             if "firewall" in got:
                 break                                   # stop knocking; the hub retries the item later
@@ -135,7 +148,7 @@ def run_table(hub, session, p):
         time.sleep(max(0.5, hub.settings.get("delay_ms", 0) / 1000))
     hub.record(f"table/{p['table_id']}", {"kind": "table", "table_id": p["table_id"], "title": p["title"],
                                           "census_year": p["census_year"], "series": p["series"], "files": len(p["files"])})
-    return n + 1, (f"{len(failed)} of {len(p['files'])} files failed: {failed[0]}" if failed else None)
+    return n + 1, settle(hub, p, failed, f"{len(failed)} of {len(p['files'])} files failed")
 
 
 def run_doc(hub, session, p):
@@ -154,7 +167,7 @@ def run_doc(hub, session, p):
                     f"library/{safe(year)}/{p['id']}/{rid}-{safe(name)}", rid,
                     {"kind": "library_file", "entry_id": p["id"], "idno": p["idno"], "file": name})
         if isinstance(got, str):
-            failed.append(f"{name}: {got}")
+            failed.append((f"{name}: {got}", f"file/{cid}/{rid}"))
             hub.failure("file", f"file/{cid}/{rid}", got)
             if "firewall" in got:
                 break
@@ -164,11 +177,12 @@ def run_doc(hub, session, p):
         time.sleep(max(0.5, hub.settings.get("delay_ms", 0) / 1000))
     hub.record(f"entry/{p['idno']}", {"kind": "library_entry", "entry_id": p["id"], "idno": p["idno"], "title": p["title"],
                                       "type": p["type"], "year": p.get("year"), "url": url, "files": len(links)})
-    return n + 1, (f"{len(failed)} of {len(links)} files failed: {failed[0]}" if failed else None)
+    return n + 1, settle(hub, p, failed, f"{len(failed)} of {len(links)} files failed")
 
 
 def run(hub, session, item):
-    return (run_table if item["payload"]["kind"] == "table" else run_doc)(hub, session, item["payload"])
+    p = {**item["payload"], "_attempts": item.get("attempts", 1)}
+    return (run_table if p["kind"] == "table" else run_doc)(hub, session, p)
 
 
 def local(kind, ident):

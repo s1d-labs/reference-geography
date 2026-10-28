@@ -35,6 +35,7 @@ STATS = f"{SITE}/thematic/thematic/usertasks/download1"
 DOCS = f"{SITE}/2dresources/thematic"
 TIMEOUT = (20, 60)          # the server sometimes never answers; a retry usually does
 TRIES = 3
+GIVE_UP = 3                 # tries of a whole document item before a file that never answers is kept as unavailable
 DATA = json.loads((Path(__file__).parent / "bhuvan_thematic.json").read_text())
 NO_MAP = {"gm", "ln", "glwb", "urbn", "lulc101619"}      # themes whose page links no state map (the page's own list)
 CONTENT_TYPES = {".pdf": "application/pdf", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png"}
@@ -198,6 +199,14 @@ def run_docs(hub, session, item):
         hub.record(f"doc/{path}", {"kind": "document", "theme": item["payload"]["theme"], "path": path, "url": url,
                                     "bytes": size, "md5": md5, "sha256": stored["sha256"], "key": stored["key"]})
         n += 1
+    if failed and item.get("attempts", 1) >= GIVE_UP:
+        # some files never answer (the Madhya Pradesh land degradation map, the Tamil Nadu 2015-16 land use map): after
+        # GIVE_UP tries of the whole item, keep them as unavailable rather than fetching the rest again and again
+        for path in failed:
+            hub.record(f"doc/{path}", {"kind": "document", "theme": item["payload"]["theme"], "path": path,
+                                        "url": f"{DOCS}/{path}", "unavailable": True,
+                                        "reason": f"no answer in {item.get('attempts')} tries"})
+        return n + len(failed), None
     return n, (f"{len(failed)} of {len(item['payload']['paths'])} documents did not load: {', '.join(failed[:3])}" if failed else None)
 
 
