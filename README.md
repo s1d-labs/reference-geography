@@ -58,6 +58,27 @@ Government Directory, railways, schools (`udise_schools`), elections, COVID-19 a
 - **Licences differ per repo** (many are ODbL or CC BY; several state none): check `license_files` / the README before
   publishing anything built on them, and credit DataMeet and the original sources.
 
+### `reference-geography-copernicus`: Sentinel product catalogue over India (Copernicus Data Space)
+
+The public catalogue of [Copernicus Data Space](https://dataspace.copernicus.eu) for Sentinel-1, -2, -3 and -5P products whose
+footprint touches India, from each mission's first month to last month: about 26,000 products a month lately (Sentinel-2 15k,
+Sentinel-3 5.8k, Sentinel-1 3.4k, Sentinel-5P 2k), roughly 2 million in all. **Metadata only**: downloading products needs a
+CDSE account (the download service answers 401 without a token) and the archive over India runs to petabytes; use the records
+to pick the products, then fetch those few with an account.
+
+- **Queue**: one item per collection per completed month, key `<collection>/<YYYY-MM>` (516 to Sep 2026); the monthly **setup**
+  run adds the month just finished. Products published after that (late or reprocessed ones) are not picked up for past months.
+- **Task** `copernicus` (`copernicus.py`): asks the OData catalogue for the month's products over India's outline (Geofabrik's
+  India boundary, buffered 0.3° and simplified to 71 points). The catalogue pages 1,000 and skips at most 10,000, so the task
+  counts first and halves the time window until each piece fits; an item fails (and is retried) if the products it got don't add
+  up to the count.
+- **Records**: one per product, id = CDSE product Id: `name`, `collection`, `product_type`, `start`, `end`, `published`,
+  `modified`, `online`, `bytes`, `md5`, `s3_path`, `footprint` (GeoJSON, 4 decimals), `attributes` (cloudCover, tileId, orbit
+  numbers, platform, processing level, …; values over 100 characters left out).
+- **Files**: each month as JSON lines at `<project>/<collection>/<YYYY-MM>.jsonl.gz`.
+- **Health check**: one product from the catalogue (1 KB). Copernicus data is free and open; credit "contains modified Copernicus
+  Sentinel data [year]".
+
 ## Working here
 
 ```
@@ -67,7 +88,9 @@ python -m pytest tests -q
 python osm.py --local [latest-url]     # resolve one file and its checksum, no download
 python bhuvan.py --local [caps-url]    # parse one Bhuvan catalogue, print the first layers
 python datameet.py --local [repo]      # download one DataMeet repo snapshot, print its inventory
+python copernicus.py --local [collection] [YYYY-MM]   # count and print one month of the catalogue
 scrape-check --items 2                 # setup + osm task against a local stand-in hub (downloads the two smallest files)
 scrape-check --project reference-geography-bhuvan-vec2 --items 1
 scrape-check --project reference-geography-datameet --items 4
+scrape-check --project reference-geography-copernicus --items 2
 ```

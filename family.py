@@ -105,8 +105,45 @@ PROJECTS.append({
     "items": datameet_items,                 # a function: see setup_family.py
 })
 
+# Copernicus Data Space (dataspace.copernicus.eu): the public catalogue of Sentinel products over India, metadata only (the
+# products themselves need an account and run to petabytes). One item per collection per completed month: about 26,000
+# products a month in 2025 (Sentinel-2 15k, Sentinel-3 5.8k, Sentinel-1 3.4k, Sentinel-5P 2k), fewer in earlier years. The
+# monthly setup run adds the month just finished.
+COPERNICUS = {                 # collection -> (first month with data, products a month lately: for progress on the dashboard)
+    "SENTINEL-1": ("2014-10", 3400), "SENTINEL-2": ("2015-06", 15000), "SENTINEL-3": ("2016-02", 5800),
+    "SENTINEL-5P": ("2017-10", 2000),
+}
+
+
+def months(first, before):
+    """["YYYY-MM", ...] from `first` up to, not including, `before`."""
+    y, m = map(int, first.split("-"))
+    out = []
+    while f"{y:04d}-{m:02d}" < before:
+        out.append(f"{y:04d}-{m:02d}")
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return out
+
+
+PROJECTS.append({
+    "name": f"{FAMILY}-copernicus",
+    "title": "Copernicus Sentinel product catalogue over India (CDSE)",
+    "task": "copernicus",
+    "target": "catalogue.dataspace.copernicus.eu",
+    "env": {},
+    "probe": f"{FAMILY}:catalogue.dataspace.copernicus.eu",
+    "max_workers": 2,
+    "unit_label": "month", "record_label": "product",
+    # oldest months first: they are the smallest, which keeps scrape-check's few items quick
+    "items": [{"key": f"{c}/{m}", "payload": {"collection": c, "month": m, "expected": n}}
+              for m in months(min(f for f, _ in COPERNICUS.values()), MONTH)
+              for c, (first, n) in COPERNICUS.items() if m >= first],
+})
+
 # health checks the hub runs every minute; work for a project holds while its probe fails
 PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}] + [
     {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN] + [
     {"name": f"{FAMILY}:github.com", "url": "https://raw.githubusercontent.com/datameet/catalog/master/README.md",
-     "expect": "datameet google group"}]
+     "expect": "datameet google group"},
+    {"name": f"{FAMILY}:catalogue.dataspace.copernicus.eu", "expect": "SENTINEL-5P",
+     "url": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=Collection/Name%20eq%20'SENTINEL-5P'&$top=1"}]

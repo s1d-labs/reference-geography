@@ -16,6 +16,10 @@
     "datameet": [
       "python",
       "datameet.py"
+    ],
+    "copernicus": [
+      "python",
+      "copernicus.py"
     ]
   }
 }
