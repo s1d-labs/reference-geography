@@ -140,10 +140,44 @@ PROJECTS.append({
               for c, (first, n) in COPERNICUS.items() if m >= first],
 })
 
+# Bhuvan Thematic Services (bhuvan-app1.nrsc.gov.in/thematic): the public statistics and documents. Historical, fixed series,
+# so the items carry no month: they are done once (the monthly setup keeps them). Structure in bhuvan_thematic.json.
+def bhuvan_thematic_items():
+    from bhuvan_thematic import DATA, doc_paths
+    items = []
+    for theme, t in DATA["themes"].items():
+        if t["statistics"]:
+            items += [{"key": f"stats/{theme}/{code}", "payload": {"kind": "stats", "theme": theme, "state": code, "census": census,
+                                                                   "name": name, "districts": t["districts"],
+                                                                   "expected": 25 if t["districts"] else 1}}
+                      for code, census, name, doc, mp in t["states"]]
+    items += [{"key": f"lulc250/{y}/{s}", "payload": {"kind": "stats", "theme": "lulc250", "year": y, "season": s,
+                                                      "expected": len(DATA["lulc250"]["regions"]) if s == "Annual" else 1}}
+              for y, seasons in DATA["lulc250"]["seasons"].items() for s in seasons]
+    items += [{"key": f"docs/{theme}", "payload": {"kind": "docs", "theme": theme, "paths": paths, "expected": len(paths)}}
+              for theme in [*DATA["themes"], "lulc250"] if (paths := doc_paths(theme))]
+    items.sort(key=lambda i: (i["key"] != "stats/fldhz/AS", i["key"]))      # the smallest first, for scrape-check
+    return items
+
+
+PROJECTS.append({
+    "name": f"{FAMILY}-bhuvan-thematic",
+    "title": "Bhuvan thematic statistics and documents (NRSC/ISRO)",
+    "task": "bhuvan-thematic",
+    "target": "bhuvan-app1.nrsc.gov.in",
+    "env": {},
+    "probe": f"{FAMILY}:bhuvan-app1.nrsc.gov.in",
+    "max_workers": 2,                        # the server hangs now and then under its own load already
+    "unit_label": "page set", "record_label": "page",
+    "items": bhuvan_thematic_items(),
+})
+
 # health checks the hub runs every minute; work for a project holds while its probe fails
 PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}] + [
     {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN] + [
     {"name": f"{FAMILY}:github.com", "url": "https://raw.githubusercontent.com/datameet/catalog/master/README.md",
      "expect": "datameet google group"},
     {"name": f"{FAMILY}:catalogue.dataspace.copernicus.eu", "expect": "SENTINEL-5P",
-     "url": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=Collection/Name%20eq%20'SENTINEL-5P'&$top=1"}]
+     "url": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=Collection/Name%20eq%20'SENTINEL-5P'&$top=1"},
+    {"name": f"{FAMILY}:bhuvan-app1.nrsc.gov.in", "expect": "ASSAM",
+     "url": "https://bhuvan-app1.nrsc.gov.in/thematic/thematic/usertasks/download1/get/getStates.php?theme=fldhz&levels=1&levelname=State"}]

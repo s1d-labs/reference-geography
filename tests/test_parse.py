@@ -81,3 +81,27 @@ def test_copernicus_queue():
     assert q["$count"] == ["true"] and "ContentDate/Start lt 2025-10-01T00:00:00.000000Z" in q["$filter"][0]
     p = next(p for p in PROJECTS if p["name"] == "reference-geography-copernicus")
     assert p["items"][0]["key"] == "SENTINEL-1/2014-10" and len({i["key"] for i in p["items"]}) == len(p["items"])
+
+
+def test_bhuvan_thematic_pages():
+    from bhuvan_thematic import parse
+    page = lambda n: (Path(__file__).parent / "pages" / f"bhuvan-stats-{n}.html").read_text(errors="replace")
+    s = parse(page("lulc503-state"))
+    assert (s["period"], s["place"], s["total"], s["unit"]) == ("2015-2016", "Andhra Pradesh", 162989.0, "Sq.Km")
+    assert s["rows"][0] == {"class": "Builtup,Urban", "values": [1725.19]} and len(s["rows"]) == 22
+    d = parse(page("lulc-dist"))
+    assert d["place"] == "Anantapur" and d["rows"][-1] == {"class": "Total", "values": [19130.0]}
+    f = parse(page("fldhz-state"))
+    assert f["rows"][0] == {"class": "Very High", "values": [128687.0, 1.64, 5.79]}       # Indian digit grouping: 1,28,687
+    k = parse(page("lulc250-in-kharif"))
+    assert k["period"] == "2023-24" and k["rows"][0]["class"] == "ANDAMAN AND NICOBAR" and k["total_unit"] == "L ha"
+    assert parse(page("ld0506-dist-empty")) is None
+
+
+def test_bhuvan_thematic_queue():
+    from bhuvan_thematic import districts, doc_paths
+    assert districts("<option>Select<option value='2822_MULTIPOLYGON(((77.6 15.1, 77.7 15.2)))'>Anantapur") == [("2822", "Anantapur")]
+    assert "LULC/MAP/Stat/AP.pdf" in doc_paths("lulc") and "wl1516/Wasteland_Atlas_2019_Full_opt.pdf" in doc_paths("wl1516")
+    p = next(p for p in PROJECTS if p["name"] == "reference-geography-bhuvan-thematic")
+    keys = [i["key"] for i in p["items"]]
+    assert keys[0] == "stats/fldhz/AS" and len(keys) == len(set(keys)) == 312

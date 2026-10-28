@@ -20,6 +20,10 @@
     "copernicus": [
       "python",
       "copernicus.py"
+    ],
+    "bhuvan-thematic": [
+      "python",
+      "bhuvan_thematic.py"
     ]
   }
 }

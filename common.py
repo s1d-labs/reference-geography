@@ -26,8 +26,8 @@ class LocalHub:
         self.metric("blocked", n)
 
 
-def request(hub, session, url, stream=False, timeout=(30, 120)):
-    """GET with the standard counters; the response if 200, else None. For a stream, t_http_s is the time to the answer's
+def request(hub, session, url, stream=False, timeout=(30, 120), accept=()):
+    """GET with the standard counters; the response if 200 (or a status in `accept`), else None. For a stream, t_http_s is the time to the answer's
     headers (what tells a busy server from a calm one); the transfer itself is counted as download_s."""
     t = time.time()
     try:
@@ -40,6 +40,8 @@ def request(hub, session, url, stream=False, timeout=(30, 120)):
     hub.metric("t_http_s", time.time() - t)
     if r.status_code != 200:
         hub.metric(f"http_{r.status_code}")
+        if r.status_code in accept:                  # the caller handles this answer itself (e.g. 404 = not there)
+            return r
         if r.status_code in (403, 429, 503):
             hub.block()
         r.close()

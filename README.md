@@ -40,6 +40,27 @@ land use 10K), `sisdp`/`sisdpv2` (10K maps), `lulc`, `wasteland`, `disaster`, `p
 - **Only the catalogue.** Bhuvan's WFS is off, and its data policy grants a single-user licence and keeps the vector databases for
   authorised (government) users, so features are not fetched. Cite as "Bhuvan, NRSC/ISRO".
 
+### `reference-geography-bhuvan-thematic`: Bhuvan thematic statistics and documents (NRSC/ISRO)
+
+Everything public on [Bhuvan Thematic Services](https://bhuvan-app1.nrsc.gov.in/thematic/thematic/index.php) apart from the
+layers themselves:
+
+- **Statistics** (one record per page): land use / land cover 50K (2005-06, 2011-12, 2015-16), land degradation (2005-06,
+  2015-16), wasteland (2008-09, 2015-16) and flood hazard, by state and, for land use and wasteland, by district; land use /
+  land cover 250K for 2005-06 to 2024-25, annual by state and for India, kharif and rabi as India's table of states (Bhuvan
+  answers every state with that same national table for those seasons). Record ids `<theme>/<state>[/<district code>]` and
+  `lulc250/<year>/<season>/<region>`; fields `title`, `period`, `place`, `total`, `total_unit`, `unit`, `columns`, `rows`
+  ([{class, values}]), plus state / district codes and names and the page `url`.
+- **Documents**: the technical documents, atlases, statistics PDFs and state maps the page links (493 files, the page's own
+  link rules in `doc_paths()`), at `<project>/docs/<path>`; record id `doc/<path>`, `missing: true` for links the server 404s.
+- **Queue**: `stats/<theme>/<state>`, `lulc250/<year>/<season>`, `docs/<theme>`: 312 items, done once (fixed historical
+  series, no month in the key). The themes, states, census codes, document paths and 250K years were read from the page on
+  2026-10-28 into `bhuvan_thematic.json`; re-read it if Bhuvan adds a year.
+- **The server** hangs now and then: pages get 3 tries with a 60 s limit, an item with a page still unanswered fails and the hub
+  retries it later; at most 2 workers. Health check: the 350-byte flood-hazard state list.
+- **Not collected**: the layers' features (Bhuvan's policy keeps the vector databases for authorised government users) and the
+  district boundaries Bhuvan sends inside its district lists (only codes and names are kept); the login-only NOEDA archive.
+
 ### `reference-geography-datameet`: DataMeet open datasets (github.com/datameet)
 
 Snapshots of 33 of [DataMeet](https://github.com/datameet)'s repositories, about 6.4 GB unpacked: maps (`maps`,
@@ -89,6 +110,7 @@ python osm.py --local [latest-url]     # resolve one file and its checksum, no d
 python bhuvan.py --local [caps-url]    # parse one Bhuvan catalogue, print the first layers
 python datameet.py --local [repo]      # download one DataMeet repo snapshot, print its inventory
 python copernicus.py --local [collection] [YYYY-MM]   # count and print one month of the catalogue
+python bhuvan_thematic.py --local stats/wl1516/KL    # one thematic item: a state and its districts
 scrape-check --items 2                 # setup + osm task against a local stand-in hub (downloads the two smallest files)
 scrape-check --project reference-geography-bhuvan-vec2 --items 1
 scrape-check --project reference-geography-datameet --items 4
