@@ -61,6 +61,26 @@ layers themselves:
 - **Not collected**: the layers' features (Bhuvan's policy keeps the vector databases for authorised government users) and the
   district boundaries Bhuvan sends inside its district lists (only codes and names are kept); the login-only NOEDA archive.
 
+### `reference-geography-census`: Census of India tables and digital library (censusindia.gov.in)
+
+Everything in the Census of India's public catalogue ([NADA](https://censusindia.gov.in/nada/index.php/home)), which the
+website's census tables, handbooks, atlas and library pages all read from:
+
+- **Census tables** of 1991, 2001 and 2011: 779 tables (Primary Census Abstract, age, workers, housing, SC/ST, education,
+  migration, religion, language, village and town directories, …) with every India, state and district file they offer:
+  about 31,000 files, mostly Excel, 7-8 GB. Stored at `<project>/tables/<year>/<table id>/<download id>-<file>`.
+- **Digital library**: 9,028 entries (8,843 documents: census reports and administration reports from 1872 on, handbooks,
+  notes, circulars; 177 historical photos; 7 videos), roughly 95 GB of mostly scanned PDFs. Stored at
+  `<project>/library/<year>/<entry id>/<download id>-<file>`.
+- **Queue**: `table/<table id>` and `doc/<entry id>`, listed from the catalogue at setup (`census_items()`, about 3 minutes),
+  so the monthly run adds new tables and entries; existing keys are kept.
+- **Records**: one per file, id `file/<catalogue id>/<download id>` (NADA's ids: `table_id`, `census_year`, `state`,
+  `district`, `format`, `file`, `bytes`, `md5`, `sha256`, `key`, `url`), one per table (`table/<id>`: `title`, `series`) and
+  one per library entry (`entry/<idno>`: `title`, `type`, `year`).
+- **Gently**: the site sits behind a firewall that answers some URLs with "Request Rejected" (its detailed API among them); the
+  task stays on the public listing API and catalogue pages, counts a rejection as a refusal for the hub's back-off and leaves
+  the item for a later retry. At most 3 workers; files come at under 1 MB/s each.
+
 ### `reference-geography-datameet`: DataMeet open datasets (github.com/datameet)
 
 Snapshots of 33 of [DataMeet](https://github.com/datameet)'s repositories, about 6.4 GB unpacked: maps (`maps`,
@@ -111,6 +131,7 @@ python bhuvan.py --local [caps-url]    # parse one Bhuvan catalogue, print the f
 python datameet.py --local [repo]      # download one DataMeet repo snapshot, print its inventory
 python copernicus.py --local [collection] [YYYY-MM]   # count and print one month of the catalogue
 python bhuvan_thematic.py --local stats/wl1516/KL    # one thematic item: a state and its districts
+python census.py --local table PC11_A02            # three files of one census table (or: doc <entry id>)
 scrape-check --items 2                 # setup + osm task against a local stand-in hub (downloads the two smallest files)
 scrape-check --project reference-geography-bhuvan-vec2 --items 1
 scrape-check --project reference-geography-datameet --items 4

@@ -105,3 +105,15 @@ def test_bhuvan_thematic_queue():
     p = next(p for p in PROJECTS if p["name"] == "reference-geography-bhuvan-thematic")
     keys = [i["key"] for i in p["items"]]
     assert keys[0] == "stats/fldhz/AS" and len(keys) == len(set(keys)) == 312
+
+
+def test_census_helpers():
+    from census import download_links, safe
+    page = ('<a href="https://censusindia.gov.in/nada/index.php/catalog/32977/download/36796/38875_1991_PRO.pdf">PDF</a>'
+            '<a href="https://censusindia.gov.in/nada/index.php/catalog/32977/download/36796/38875_1991_PRO.pdf">again</a>'
+            '<a href="https://censusindia.gov.in/nada/index.php/catalog/43368/download/47071/35%20A-2%20Andaman%20%20Nicobar.xlsx">x</a>')
+    assert download_links(page) == [("32977", "36796", "38875_1991_PRO.pdf"), ("43368", "47071", "35 A-2 Andaman  Nicobar.xlsx")]
+    assert safe("35 A-2 Andaman  Nicobar Islands.xlsx") == "35_A-2_Andaman_Nicobar_Islands.xlsx"
+    assert safe("जनगणना.pdf") == ".pdf"           # hence the download id in front of every stored name
+    p = next(p for p in PROJECTS if p["name"] == "reference-geography-census")
+    assert callable(p["items"]) and p["target"] == "censusindia.gov.in"

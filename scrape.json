@@ -24,6 +24,10 @@
     "bhuvan-thematic": [
       "python",
       "bhuvan_thematic.py"
+    ],
+    "census": [
+      "python",
+      "census.py"
     ]
   }
 }

@@ -172,6 +172,29 @@ PROJECTS.append({
     "items": bhuvan_thematic_items(),
 })
 
+# Census of India (censusindia.gov.in): its NADA catalogue, i.e. the census tables of 1991, 2001 and 2011 with every India /
+# state / district file (about 30,000, 7-8 GB) and the digital library (about 9,000 reports, handbooks, notes, photos, videos;
+# roughly 60 GB of scanned PDFs). Listed from the catalogue at setup, so the monthly run picks up new entries.
+def census_items():
+    from census import list_library, list_tables
+    items = [{"key": f"table/{t['table_id']}", "payload": {"kind": "table", **t, "expected": len(t["files"]) + 1}}
+             for t in list_tables()]
+    items += [{"key": f"doc/{e['id']}", "payload": {"kind": "doc", **e, "expected": 2}} for e in list_library()]
+    return items
+
+
+PROJECTS.append({
+    "name": f"{FAMILY}-census",
+    "title": "Census of India tables and digital library (censusindia.gov.in)",
+    "task": "census",
+    "target": "censusindia.gov.in",
+    "env": {},
+    "probe": f"{FAMILY}:censusindia.gov.in",
+    "max_workers": 3,                        # the site sits behind a firewall that rejects what it doesn't like: go gently
+    "unit_label": "table or entry", "record_label": "file",
+    "items": census_items,                   # a function: see setup_family.py
+})
+
 # health checks the hub runs every minute; work for a project holds while its probe fails
 PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india.html", "expect": "india-latest.osm.pbf"}] + [
     {"name": f"{FAMILY}:bhuvan-{s}.nrsc.gov.in", "url": BHUVAN_PROBE.format(s=s), "expect": "PNG"} for s in BHUVAN] + [
@@ -180,4 +203,6 @@ PROBES = [{"name": f"{FAMILY}:download.geofabrik.de", "url": f"{GEOFABRIK}/india
     {"name": f"{FAMILY}:catalogue.dataspace.copernicus.eu", "expect": "SENTINEL-5P",
      "url": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products?$filter=Collection/Name%20eq%20'SENTINEL-5P'&$top=1"},
     {"name": f"{FAMILY}:bhuvan-app1.nrsc.gov.in", "expect": "ASSAM",
-     "url": "https://bhuvan-app1.nrsc.gov.in/thematic/thematic/usertasks/download1/get/getStates.php?theme=fldhz&levels=1&levelname=State"}]
+     "url": "https://bhuvan-app1.nrsc.gov.in/thematic/thematic/usertasks/download1/get/getStates.php?theme=fldhz&levels=1&levelname=State"},
+    {"name": f"{FAMILY}:censusindia.gov.in", "expect": "search_counts_by_type",
+     "url": "https://censusindia.gov.in/nada/index.php/api/catalog/search?ps=1"}]
