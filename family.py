@@ -190,7 +190,7 @@ PROJECTS.append({
     "target": "censusindia.gov.in",
     "env": {},
     "probe": f"{FAMILY}:censusindia.gov.in",
-    "max_workers": 6,                        # behind a firewall that rejects what it doesn't like: 3 at first, 6 for the backfill
+    "max_workers": 8,                        # behind a firewall that rejects what it doesn't like: 3 at first, 8 for the backfill
     "unit_label": "table or entry", "record_label": "file",
     "items": census_items,                   # a function: see setup_family.py
 })
