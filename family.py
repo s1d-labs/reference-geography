@@ -177,9 +177,13 @@ PROJECTS.append({
 # roughly 60 GB of scanned PDFs). Listed from the catalogue at setup, so the monthly run picks up new entries.
 def census_items():
     from census import list_library, list_tables
+    # scrape-check runs setup with a 5-minute limit; listing the whole catalogue takes 3 minutes on a good day, so there it
+    # lists a first page of each (enough to test the task); the real setup lists everything
+    quick = os.environ.get("SCRAPE_HUB_TOKEN") == "scrape-check"
     items = [{"key": f"table/{t['table_id']}", "payload": {"kind": "table", **t, "expected": len(t["files"]) + 1}}
-             for t in list_tables()]
-    items += [{"key": f"doc/{e['id']}", "payload": {"kind": "doc", **e, "expected": 2}} for e in list_library()]
+             for t in list_tables(first_page_only=quick)]
+    items += [{"key": f"doc/{e['id']}", "payload": {"kind": "doc", **e, "expected": 2}}
+              for e in list_library(first_page_only=quick)]
     return items
 
 

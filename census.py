@@ -49,7 +49,7 @@ def _get_json(s, url, params=None, timeout=120, tries=4):
             time.sleep(10 * (i + 1))
 
 
-def list_tables(session=None):
+def list_tables(session=None, first_page_only=False):
     """Every census table with its files: [{"table_id", "title", "census_year", "series", "files": [...]}]."""
     s = session or requests.Session()
     out, offset = [], 0
@@ -63,11 +63,11 @@ def list_tables(session=None):
             out.append({"table_id": t["table_id"], "title": t["title"], "census_year": t.get("census_year"),
                         "series": [x["series_title"] for x in t.get("series") or []], "files": files})
         offset += len(d["data"])
-        if not d["data"] or offset >= d["found"]:
+        if not d["data"] or offset >= d["found"] or first_page_only:
             return out
 
 
-def list_library(session=None):
+def list_library(session=None, first_page_only=False):
     """Every library entry (documents, photos, videos): [{"id", "idno", "title", "type", "year"}]."""
     s = session or requests.Session()
     out = []
@@ -81,7 +81,7 @@ def list_library(session=None):
                     seen.add(int(x["id"]))
                     out.append({"id": int(x["id"]), "idno": x["idno"], "title": x.get("title") or "",
                                 "type": x.get("type") or kind, "year": x.get("year_start")})
-            if not r["rows"] or page * 100 >= int(r["found"]):
+            if not r["rows"] or page * 100 >= int(r["found"]) or first_page_only:
                 break
             page += 1
             time.sleep(0.5)
