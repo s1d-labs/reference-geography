@@ -57,6 +57,11 @@ def resolve(hub, session, url):
         m = request(hub, session, r.url + ".md5")
         md5 = m and parse_md5(m.text, name)
         if not md5:
+            # Geofabrik can publish the dated .pbf a little before its dated .md5 (2026-11-04: "no checksum" for both zones).
+            # The `latest` .md5 then names the same bytes; a wrong one still fails the md5 check after the download.
+            m = request(hub, session, url + ".md5")
+            md5 = m and parse_md5(m.text, url.rsplit("/", 1)[-1])
+        if not md5:
             r.close()
             return f"no checksum for {name}"
     return r, name, info, md5
